@@ -1,0 +1,340 @@
+PERSISTENT REQUIREMENT: This file (ivn-keyword-crosswalk.txt) must always be kept so accurate and up-to-date that a naive LLM could fully and correctly regenerate the current state of ivn-keyword-crosswalk.py using only the instructions and information in this file. Any change to the script, its logic, output, error handling, or user interaction must be immediately and precisely reflected here. This is the top priority for this documentation.
+
+IVN Keyword Crosswalk Analysis Tool - Complete Context Documentation
+====================================================================
+
+SCRIPT STATUS: IMPLEMENTED AND TESTED
+=====================================
+The Python script (ivn-keyword-crosswalk.py) has been successfully implemented based on this documentation.
+- All functionality matches the specifications
+- Tiered fallback system working correctly
+- Sample input file (ivntest.xlsx) created for testing
+- Output file (ivn-keyword-crosswalk-yyyy-mm-dd-hh-mm-ss.xlsx) generated with all 9 required tabs
+- At the end of script execution, the following reminder is printed to the screen:
+  "Remember, you may want to add keywords relevant to the Component as keywords at the end of the Component Description text."
+
+PROBLEM STATEMENT
+=================
+The problem involves analyzing governance document components to facilitate cross-referencing
+between different document sets. Specifically, the tool identifies uncommon words in component
+descriptions that can serve as matching keys between a reference set (Components tab) and a
+new set (to-be-crosswalked tab). This helps in governance document management by finding
+semantic connections between components that may use similar specialized terminology.
+
+BROADER CONTEXT
+===============
+In governance, risk, and compliance (GRC) frameworks, organizations maintain multiple
+document sets that describe controls, requirements, and components. These documents often
+evolve independently, creating challenges in maintaining consistency and traceability.
+The tool addresses the need to automatically identify potential relationships between
+components in different document sets based on their linguistic patterns rather than
+explicit identifiers.
+
+CONCEPTS TO UNDERSTAND
+======================
+1. Word Frequency Analysis: Statistical analysis of how often words appear in text corpora
+2. Cross-referencing: Establishing connections between items in different datasets
+3. Uncommonality Scoring: Measuring how distinctive a word is in a specific context
+   compared to general usage
+4. Text Normalization: Standardizing text for analysis (case folding, punctuation removal)
+5. Tiered Fallback Systems: Implementing multiple approaches with graceful degradation
+
+PREREQUISITE KNOWLEDGE
+======================
+1. Basic Python programming
+2. Understanding of DataFrames (pandas library)
+3. Natural Language Processing fundamentals
+4. Excel file structure and manipulation
+5. Statistical concepts of frequency and ratio calculations
+
+DOMAIN-SPECIFIC TERMS
+=====================
+1. IVN: Likely stands for "Integrated Validation Network" or similar governance framework
+2. Components: Discrete elements or deliverables in governance documents
+3. Crosswalk: A mapping or relationship between elements in different systems
+4. Atypical Keywords: Words that are unusual or distinctive in a specific context
+5. Component Description: Textual description of a governance component
+6. Uncommonality Score: Quantitative measure of how unusual a word is in context
+
+HIGH-LEVEL SCRIPT DESCRIPTION
+=============================
+The script analyzes word frequencies in governance document components to identify
+uncommon words that can serve as matching keys between different document sets. It:
+
+1. Loads common English word frequencies using a tiered approach
+2. Analyzes word frequencies in the IVN component descriptions
+3. Calculates "uncommonality scores" for words by comparing IVN frequencies to general English
+4. Identifies atypical keywords in each component description
+5. Generates an Excel file with multiple analysis tabs for review and cross-referencing
+
+WHY THE SCRIPT EXISTS
+=====================
+Manual cross-referencing of governance documents is time-consuming and error-prone.
+The script automates the identification of potential matches based on linguistic
+patterns, enabling more efficient governance document management and traceability
+maintenance.
+
+ROLE OF THE SCRIPT
+==================
+The script serves as an automated analysis tool that:
+- Processes structured document data from Excel files
+- Performs linguistic analysis to identify distinctive terminology
+- Generates actionable insights for document cross-referencing
+- Creates standardized output for further review and decision-making
+
+KEY CONCEPTS AND LEARNING DATA
+==============================
+1. Common English Word Frequencies: Baseline for comparison
+2. IVN-Specific Word Frequencies: Domain-specific terminology patterns
+3. Strings to Ignore: Common words filtered from analysis
+4. Uncommonality Metric: IVN frequency ÷ Common frequency
+5. Atypical Keywords: Uncommon words sorted by distinctiveness
+
+INPUT/OUTPUT DEFINITIONS
+========================
+INPUT:
+- File: ivntest.xlsx
+- Required tabs: "Components", "to-be-crosswalked"
+- Required column: "Component Description" in both tabs
+- Format: Excel (.xlsx) with textual data in specified columns
+
+OUTPUT:
+- File: ivn-keyword-crosswalk-yyyy-mm-dd-hh-mm-ss.xlsx (timestamped)
+- Tabs:
+  1. common-words: Common English words with frequency ratios (0-1)
+  2. common-ivn-words: IVN words with frequency ratios (0-1)
+  3. strings-to-ignore: 100 most common English words (always recreated, user modifications are NOT preserved in the current script)
+  4. uncommon-ivn-words: IVN words with uncommonality scores
+  5. keywords-dataset: Components tab with added "atypical-keywords" column
+  6. new-components-keywords: to-be-crosswalked tab with added "atypical-keywords" column
+  7. keywords-crosswalk: Crosswalk table comparing all pairs with similarity scores
+  8. Dataset-is-enabling: Copied from input or created as an empty tab
+  9. New-comp-is-enabling: Copied from input or created as an empty tab
+
+IMPORTANT: OUTPUT TABS REQUIREMENT (as of [latest update])
+=========================================================
+The output Excel file will ALWAYS include the following two tabs, in addition to the standard analysis tabs:
+  8. Dataset-is-enabling
+  9. New-comp-is-enabling
+
+- If these tabs are present in the input Excel file, their contents will be copied to the output file.
+- If either tab is missing from the input, the script will create an empty tab with the correct name in the output file.
+- This is a persistent requirement: all future versions of the script and documentation must maintain this behavior.
+- The total number of output tabs is now NINE (9): the original seven analysis tabs plus these two user-defined tabs.
+- The order of tabs in the output file is: common-words, common-ivn-words, strings-to-ignore, uncommon-ivn-words, keywords-dataset, new-components-keywords, keywords-crosswalk, Dataset-is-enabling, New-comp-is-enabling.
+
+COMMAND-LINE EXECUTION:
+  python ivn-keyword-crosswalk.py
+  
+  The script will prompt for a similarity threshold during execution:
+  - Samples 1000 potential pairs to calculate average similarity
+  - Recommends this average as the minimum threshold
+  - User can press Enter to accept or enter a custom value (0-1)
+
+DATA STRUCTURES:
+- Dictionaries for word frequency mappings
+- Pandas DataFrames for tabular data manipulation
+- Lists for ordered collections of words
+
+VALIDITY CHECKS
+===============
+The script performs these validity checks:
+1. Input file existence verification
+2. Required tab presence validation
+3. Required column presence validation
+4. Text data type checking
+5. Output file preservation of user modifications
+
+STRUCTURE AND CONTENT OF FINAL OUTPUT
+======================================
+The output Excel file contains nine tabs with specific purposes:
+
+1. common-words: Reference data for general English word frequencies
+2. common-ivn-words: Analysis of word frequencies in the IVN documents
+3. strings-to-ignore: Filter list that preserves user modifications
+4. uncommon-ivn-words: Calculated uncommonality scores for cross-referencing
+5. keywords-dataset: Enhanced Components data with identified atypical keywords
+6. new-components-keywords: Enhanced to-be-crosswalked data for matching
+7. keywords-crosswalk: Cartesian product of all dataset-new_component pairs with similarity analysis
+8. Dataset-is-enabling: Copied from input or created as an empty tab
+9. New-comp-is-enabling: Copied from input or created as an empty tab
+
+DEFINITIONS OF SUCCESSFUL OUTCOME
+=================================
+Successful execution requires:
+1. Input file loaded without errors
+2. Common words data obtained (via any tier)
+3. All analysis calculations completed
+4. Output Excel file generated with all nine tabs
+5. Atypical keywords identified in both document sets
+
+SUCCESSFUL EXECUTION CRITERIA
+=============================
+1. Script runs to completion without fatal errors
+2. Output file is created/updated with all required tabs (9 tabs)
+3. Analysis columns are properly populated
+4. Uncommonality scores are calculated for relevant words
+5. Keywords-crosswalk tab contains filtered pairs above similarity threshold
+6. Warns user if potential crosswalk size exceeds Excel limits
+7. At the end, prints the reminder message about adding keywords to Component Descriptions
+
+ERROR HANDLING LOGIC
+====================
+TIERED FALLBACK SYSTEM:
+1. Primary: Use NLTK Brown corpus (auto-downloads if needed)
+2. Fallback: Use bundled COCA-based word list
+3. Final: Exit with setup instructions if all else fails
+
+INPUT VALIDATION:
+- Flexible tab name matching (case-insensitive, ignores hyphens/spaces)
+- Flexible column name matching (case-insensitive, ignores spaces/underscores)
+- Missing input file: Exit with error message
+- Missing required tabs: Exit with error listing available tabs
+- Missing required columns: Exit with error listing available columns
+
+OUTPUT PRESERVATION:
+- Existing output file: The current script always recreates the 'strings-to-ignore' tab from the top 100 common words. User modifications to this tab are NOT preserved.
+- Tab existence: All tabs are always regenerated with fresh analysis.
+- Dataset-is-enabling and New-comp-is-enabling tabs: Always included, copied from input or created as empty tabs.
+
+SPECIFIC ERROR CASES:
+- Network issues for NLTK download: Fall back to bundled list
+- Corrupted input data: Skip problematic rows, continue processing
+- Permission issues: Exit with clear error message
+
+DEFINITIONS OF CORRECT LLM BEHAVIOR
+===================================
+When regenerating or modifying this script, an LLM should:
+
+1. PRESERVE CORE FUNCTIONALITY:
+   - Maintain the nine-tab output structure
+   - Keep the tiered fallback system for common words
+   - Preserve the text normalization rules exactly
+   - Maintain the uncommonality scoring formula
+
+2. FOLLOW ARCHITECTURAL PATTERNS:
+   - Use the class-based structure with the run() method
+   - Implement error handling as specified
+   - Preserve the input validation logic
+   - Maintain the output preservation logic
+
+3. ADHERE TO SPECIFICATIONS:
+   - Case-insensitive text processing
+   - Punctuation removal except hyphens
+   - Strings-to-ignore recreation
+   - Uncommonality score calculation: IVN ratio ÷ Common ratio
+
+4. DOCUMENTATION STANDARDS:
+   - Update this context file with any changes
+   - Maintain clear function documentation
+   - Preserve the print statement structure for user feedback
+
+"WORKING CORRECTLY" MEANS:
+- The script processes the exact same input to produce the exact same output structure
+- Text normalization is applied consistently
+- Uncommonality scores are calculated correctly
+- All tabs are created with correct column headers
+
+EXAMPLE SCENARIOS OR TEST CASES
+===============================
+SCENARIO 1: First-time execution with NLTK available
+- Input: ivntest.xlsx with Components and to-be-crosswalked tabs
+- Process: Downloads Brown corpus, performs analysis
+- Output: Creates ivn-keyword-crosswalk-yyyy-mm-dd-hh-mm-ss.xlsx with all tabs
+- Strings-to-ignore: Created from top 100 common words
+
+SCENARIO 2: Execution without NLTK
+- Input: Same as above
+- Process: Falls back to bundled word list
+- Output: Same structure, using bundled frequencies
+- Strings-to-ignore: From bundled top 100
+
+SCENARIO 3: Subsequent execution with user modifications
+- Input: ivntest.xlsx (possibly updated)
+- Existing: ivn-keyword-crosswalk-yyyy-mm-dd-hh-mm-ss.xlsx with user-added strings-to-ignore
+- Process: Preserves user strings-to-ignore, updates other tabs
+- Output: Updated file with preserved user modifications
+
+SCENARIO 4: Invalid input file
+- Input: Missing or corrupted ivntest.xlsx
+- Process: Validates and exits with clear error
+- Output: No file created, error message to console
+
+SCENARIO 5: Missing required tab
+- Input: ivntest.xlsx missing "to-be-crosswalked" tab
+- Process: Validates and exits listing available tabs
+- Output: No file created, error message to console
+
+TEXT NORMALIZATION RULES (CRITICAL)
+===================================
+These rules MUST be preserved exactly:
+1. Convert all text to lowercase
+2. Remove all punctuation EXCEPT hyphens
+3. Split on whitespace (after punctuation removal)
+4. Treat hyphenated words as single tokens (e.g., "end-to-end")
+5. Process apostrophes by removal (e.g., "system's" → "systems")
+
+TIERED FALLBACK IMPLEMENTATION DETAILS
+=======================================
+The tiered approach must be implemented in this exact order:
+
+1. PRIMARY (NLTK Brown Corpus):
+   - Try to access nltk.corpus.brown
+   - Auto-download if not available
+   - Calculate frequencies from corpus
+   - Extract top 100 words for strings-to-ignore
+
+2. FALLBACK (Bundled COCA-based List):
+   - Use embedded frequency dictionary
+   - Contains approximately 10,000 words
+   - Realistic frequency ratios
+   - Top 100 used for strings-to-ignore
+
+3. FINAL (Exit with Instructions):
+   - Only if both above fail
+   - Print clear setup instructions
+   - Exit gracefully with error code
+
+OUTPUT FILE PRESERVATION LOGIC
+==============================
+When output file exists:
+1. Check for 'strings-to-ignore' tab
+2. If exists: Read and preserve ALL content
+3. If missing: Create with standard top 100 words
+4. Always regenerate other tabs with fresh analysis
+5. Never overwrite user modifications to strings-to-ignore
+6. Always include Dataset-is-enabling and New-comp-is-enabling tabs, copied from input or created as empty tabs.
+
+UNCOMMONALITY SCORING FORMULA
+=============================
+For each word found in IVN descriptions:
+1. Get IVN frequency ratio: (word count in IVN) / (total words in IVN)
+2. Get Common frequency ratio: From common words data (0 if not found)
+3. Calculate: Uncommonality Score = IVN ratio ÷ Common ratio
+   - If Common ratio = 0: Use 1e6 (very high score)
+   - Higher score = more distinctive/uncommon in IVN context
+4. Sort atypical keywords by this score (descending)
+
+ATYPICAL KEYWORDS EXTRACTION
+============================
+For each component description:
+1. Normalize text (lowercase, remove punctuation except hyphens)
+2. Split into words
+3. Remove words found in strings-to-ignore
+4. Get uncommonality score for each remaining word
+5. Sort words by score (highest first)
+6. Remove duplicates while preserving order
+7. Join with comma delimiter
+
+UPDATING THIS CONTEXT FILE
+==========================
+When modifying the script, ALWAYS update this context file to reflect:
+1. New functionality or changes to existing functionality
+2. Modified data structures or algorithms
+3. Updated error handling or validation
+4. Changes to input/output specifications
+5. New dependencies or requirements
+
+The context file must remain sufficient for a naive LLM to completely regenerate
+the script from scratch while maintaining all specified functionality and behavior.
+```
